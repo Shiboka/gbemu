@@ -41,6 +41,10 @@ proc exec(): void =
             H = cast[uint8](HL shr 8)
             L = cast[uint8](HL)
             echo "ldd (hl), a: ", toHex(HL)
+        of 0x06:
+            B = memory[PC+1]
+            PC += 2
+            echo "ld b, ", toHex(B)
         else:
             echo toHex(memory[PC])
             PC += 1
