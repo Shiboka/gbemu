@@ -59,8 +59,8 @@ proc exec(): void =
             echo "dec b: ", toHex(B)
         of 0x20:
             if bitand(F, 0b1000_0000) == 0b0000_0000:
-                PC += memory[PC+1]
                 echo "jr nz, ", toHex(memory[PC+1]), " TRUE"
+                PC += memory[PC+1]
             else:
                 echo "jr nz, ", toHex(memory[PC+1]), " FALSE"
                 PC += 2
