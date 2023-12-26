@@ -50,7 +50,7 @@ proc exec(): void =
         of 0x05:
             B -= 1
             if B == 0:
-                F = bitor(F, 0b1000_0000)
+                F = bitor(F, 0b1100_0000)
             else:
                 F = bitand(F, 0b0111_0000)
                 F = bitor(F, 0b0100_0000)
