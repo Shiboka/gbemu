@@ -48,13 +48,19 @@ proc exec(): void =
             PC += 2
             echo "ld b, ", toHex(B)
         of 0x05:
+            if bitand(bitand(B, 0xf) - 1, 0x10) == 0x10:
+                F = bitor(F, 0b0010_0000)
+            else:
+                F = bitand(F, 0b1101_0000)
+
             B -= 1
+
             if B == 0:
                 F = bitor(F, 0b1100_0000)
             else:
                 F = bitand(F, 0b0111_0000)
                 F = bitor(F, 0b0100_0000)
-            # do something with H flag
+
             PC += 1
             echo "dec b: ", toHex(B)
         of 0x20:
