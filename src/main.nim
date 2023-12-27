@@ -1,5 +1,9 @@
 import std/[strutils, bitops]
 
+type
+    Flags = object
+        Z, N, H, C: bool
+
 const
     HEADER_SIZE = 0x014f
     BANK_SIZE = 16000
@@ -10,8 +14,9 @@ let
     rom_size = header[0x0148]
 
 var
-    A, B, C, D, E, H, L, F: uint8 = 0
+    A, B, C, D, E, H, L: uint8 = 0
     PC: uint16 = 0x0100
+    flags = Flags(Z: false, N: false, H: false, C: false)
     memory: array[0xffff, uint8]
 
 memory[0..0x3fff] = rom[0..0x3fff]
@@ -23,7 +28,7 @@ proc exec(): void =
             echo "jp ", toHex(PC)
         of 0xaf:
             A = A xor A
-            F = 0b1000_0000
+            flags.Z = true
             PC += 1
             echo "xor A"
         of 0x21:
@@ -48,23 +53,19 @@ proc exec(): void =
             PC += 2
             echo "ld b, ", toHex(B)
         of 0x05:
+            flags.N = true
+
             if bitand(bitand(B, 0xf) - 1, 0x10) == 0x10:
-                F = bitor(F, 0b0010_0000)
+                flags.H = true
             else:
-                F = bitand(F, 0b1101_0000)
+                flags.H = false
 
             B -= 1
-
-            if B == 0:
-                F = bitor(F, 0b1100_0000)
-            else:
-                F = bitand(F, 0b0111_0000)
-                F = bitor(F, 0b0100_0000)
-
+            flags.Z = B == 0
             PC += 1
             echo "dec b: ", toHex(B)
         of 0x20:
-            if bitand(F, 0b1000_0000) == 0b0000_0000:
+            if not flags.Z:
                 echo "jr nz, ", toHex(memory[PC+1]), " TRUE"
                 PC += memory[PC+1]
             else:
